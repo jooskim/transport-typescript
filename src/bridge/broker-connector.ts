@@ -6,8 +6,12 @@
 import { ConnectionState, StompClient } from './stomp.client';
 import { Observable, Subscription } from 'rxjs';
 import {
-    StompSession, BrokerConnectorChannel, StompBusCommand, StompSubscription, StompMessage,
-    StompConfig
+    BrokerConnectorChannel,
+    StompBusCommand,
+    StompConfig,
+    StompMessage,
+    StompSession,
+    StompSubscription
 } from '../bridge/stomp.model';
 import { StompParser } from '../bridge/stomp.parser';
 import { StompValidator } from './stomp.validator';
@@ -17,6 +21,8 @@ import { TransportEventBus } from '../bus/bus';
 import { ChannelBrokerMapping, EventBus, EventBusEnabled } from '../bus.api';
 import { Logger } from '../log';
 import { FabricUtil } from '../fabric/fabric.util';
+import { FabricConnectionState } from '../fabric.api';
+import { GeneralUtil } from '../util/util';
 
 /**
  * Service is responsible for handling all STOMP communications over a socket.
@@ -594,6 +600,9 @@ export class BrokerConnector implements EventBusEnabled {
                     this.sendBusCommandResponseRaw(message, BrokerConnectorChannel.connection, true);
                 }
 
+                // upon (re)connection update FabricConnectionState store
+                this.bus.fabric.getConnectionStateStore(connString)
+                    .put(connString, FabricConnectionState.Connected, FabricConnectionState.Connected);
             }
         );
     }

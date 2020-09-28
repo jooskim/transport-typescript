@@ -5,7 +5,7 @@
 
 import { UUID } from './bus/store/store.model';
 import { MessageFunction } from './bus.api';
-import { StoreStream } from './store.api';
+import { BusStore, StoreStream } from './store.api';
 import { APIRequest } from './core/model/request.model';
 import { Observable } from 'rxjs';
 import { APIResponse } from './core/model/response.model';
@@ -42,7 +42,7 @@ export interface FabricApi {
      * @param numRelays how many relays are being used? Defaults to 1.
      * @param connectHandler lambda to fire when the fabric is connected.
      * @param disconnectHandler  lambda to fire when the fabric is disconnected.
-     * @param autoReconnect if disconnected, want to auto-reconnect? defaults to false.
+     * @param autoReconnect if disconnected, want to auto-reconnect? defaults to true.
      */
     connect(
         connectHandler: MessageFunction<string>,
@@ -58,17 +58,23 @@ export interface FabricApi {
     /**
      * Disconnect from fabric.
      */
-    disconnect(connString: string): void;
+    disconnect(connString?: string): void;
 
     /**
      * returns current fabric connection status.
      */
-    isConnected(connString: string): boolean;
+    isConnected(connString?: string): boolean;
+
+    /**
+     * Get FabricConnectionState store for the given connection string.
+     * @param connString
+     */
+    getConnectionStateStore(connString?: string): BusStore<FabricConnectionState>;
 
     /**
      * Grab a reference to state stream for connections.
      */
-    whenConnectionStateChanges(connString: string): StoreStream<FabricConnectionState>;
+    whenConnectionStateChanges(connString?: string): StoreStream<FabricConnectionState>;
 
     /**
      * Generate a payload designed for fabric services, essentially a shortcut.
@@ -99,7 +105,7 @@ export interface FabricApi {
     /**
      * Get fabric version.
      */
-    getFabricVersion(connString: string): Observable<string>;
+    getFabricVersion(connString?: string): Observable<string>;
 
     /**
      * Set sessionStorage key for access token.
